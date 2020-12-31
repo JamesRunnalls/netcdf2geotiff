@@ -15,9 +15,12 @@ def rgb_geotiff(file, outfile, red, green, blue, lat, lon):
         lon = np.array(nc.variables[lon][:])
         image_size = red.shape
 
-    r_pixels = np.around((( red - np.amin(red) ) / ( np.amax(red) - np.amin(red) )) * 255)
-    g_pixels = np.around((( green - np.amin(green) ) / ( np.amax(green)  - np.amin(green) )) * 255)
-    b_pixels = np.around((( blue - np.amin(blue) ) / ( np.amax(blue)  - np.amin(blue) )) * 255)
+    if np.isnan(red).all() or np.isnan(green).all() or np.isnan(blue).all():
+        return False
+
+    r_pixels = np.around((( red - np.nanmin(red) ) / ( np.nanmax(red) - np.nanmin(red) )) * 255)
+    g_pixels = np.around((( green - np.nanmin(green) ) / ( np.nanmax(green)  - np.nanmin(green) )) * 255)
+    b_pixels = np.around((( blue - np.nanmin(blue) ) / ( np.nanmax(blue)  - np.nanmin(blue) )) * 255)
 
     # set geotransform
     nx = image_size[0]
@@ -48,7 +51,10 @@ def singleband_geotiff(file, outfile, band, lat, lon):
         lon = np.array(nc.variables[lon][:])
         image_size = band.shape
 
-    b_pixels = np.around(((band - np.amin(band)) / (np.amax(band) - np.amin(band))) * 255)
+    if np.isnan(band).all():
+        return False
+
+    b_pixels = np.around(((band - np.nanmin(band)) / (np.nanmax(band) - np.nanmin(band))) * 255)
     a_pixels = band
 
     # set geotransform
